@@ -189,3 +189,10 @@ for (i in 1){
 as.integer(sum1)
 
 rmarkdown::render('knitr_demo.Rmd')
+
+write.csv(clients_urfm %>% group_by(rf) %>% summarise(Part=round(100*n()/nrow(clients_urfm), 2), n=n(), money=sum(money),
+                                                      money_part=(round(100*sum(money)/sum(clients_urfm$money), 2))) %>% 
+            arrange(desc(money)) %>% mutate_if(is.numeric, funs(as.character(signif(., 10)))), file='clients_urfm.csv')
+clients_urfm %>% group_by(rf) %>% summarise(Part=round(100*n()/nrow(clients_urfm), 2), n=n(), money=sum(money),
+                                            money_part=(round(100*sum(money)/sum(clients_urfm$money), 2))) %>% 
+  arrange(desc(money)) %>% mutate_if(is.numeric, funs(as.character(signif(., 10))))

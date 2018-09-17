@@ -10,8 +10,7 @@ output:
   
   ```{r setup, include=FALSE}
 library(dplyr)
-library(tidyr)
-library(xtable)
+library(bit64)
 library(ggplot2)
 options(scipen = 0, digits = 3)
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
@@ -19,7 +18,7 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 
 ## Introduction
 
-The data set contains `r nrow(rfm)` measurements of `r nrow(clients_urfm)` Yandex.Market users' activities, collected from `r min(rfm$date)` till `r max(rfm$date)`. We have also manuals on goods categories and geoposition information.
+The data set contains `r nrow(rfm)` measurements of `r nrow(clients_urfm)` Yandex.Market users activities, collected from `r min(rfm$date)` till `r max(rfm$date)`. We have also manuals on goods categories and geoposition information.
 
 ## Hypothesis
 
@@ -43,19 +42,20 @@ In order to find out proper frequency division, let's see, how many clicks per c
 summary(clicks$clicks)
 ```
 
+\newpage
 The main part of our distribution is concentrated approximately between 0 and 30 clicks:
 
 ```{r ggplot, fig.width=6, fig.height=4}
 ggplot(filter(clicks, clicks>=0), aes(clicks)) + geom_histogram() + xlim(0,30)
 ```
 
-According to the visualization, frequency parameter may be divided in this way:
+According to the visualization, frequency parameter may be divided this way:
 
 1. Customers with more or equal 16 clicks;
 2. 11-15 clicks;
 3. 5-10 clicks;
 4. 2-4 clicks;
-5. 0-1 clicks.
+5. 0-1 click.
 
 The next step of RFM-analysis is to make monetary parameter and also clusterise it. But it's much easier to visualize and moreover to perceive recency/frequency distribution with sum of price variable. So, after comparing each customer its recency and frequency group, we get the following result:
 
@@ -71,20 +71,20 @@ clients_urfm %>% group_by(rf) %>% summarise('Part (%)'=round(100*n()/nrow(client
                              'Money part (%)'))
 ```
 
-As we can see, despite the 1-Recency group is just a 1.58% of all customers, its monetary coverage makes 94.31%. This group of customers is the most valuable for Yandex.Market. 11-group, for example, consists of users who click on internet shops URLs more often and more recently than any another customers, so-called VIP. Remaining 1R groups (21, 31, 41, 51) are those customers, who used to be or didn't become 11-group. They are probably united by the fact that somewhat of Yandex.Market's service disappointed them, and they stopped to use or became less use of the service.
+As we can see, despite the 1-Frequency group is just a 1.58% of all customers, its monetary coverage makes 94.31%. This group of customers is the most valuable for Yandex.Market. 11-group, for example, consists of users who click on internet shops URLs more often and more recently than any another customers, so-called VIP. Remaining 1F groups (21, 31, 41, 51) are those customers, who used to be or didn't become 11-group. They are probably united by the fact that somewhat of Yandex.Market's service disappointed them, and they stopped to use or became less use of the service. Or they have just cooled down.
 
 \newpage
 ##Proposition
 
-The proposition to LTV's increase is to impact on these 1R groups in order to compact them to 11-group as much as possible.
+The proposition to LTV's increase is to impact on these 1F groups in order to compact them to 11-group as much as possible.
 
-1. 11-group is our VIP-segment. They have done some actions most recently and they do this really often. But it doesn't mean that we need to relax and forget about them. Without consolidation of success they can turn into 21-group or even worse. We need to stay in touch with these customers and time to time send them some small form, for example, where they could indicate things in service they would like to change. Or they could also make suggestions to market's service. That's the way for customers to feel themselves important and moreover it increases loyalty. These actions should cost something to Market, but it should save much more in prospect.
+1. 11-group is our VIP-segment. They have done some actions most recently and they do this really often. But it doesn't mean that we need to relax and forget about them. Without consolidation of success they can turn into 21-group or even worse. We need to stay in touch with these customers and time to time send them some small forms, for example, where they could indicate things in service they would like to change. Or they could also make suggestions to markets service. That's the way for customers to feel themselves important and moreover it increases loyalty. These actions should cost something to Market, but it should save much more in prospect.
 
-2. 21 and 31-groups are also the most frequent users, but they haven't been active in past 2-3 months. They need to be reminded about Yandex.Market. In addition to actions from previous clause we could analyze their previous clicks in order to find out theirs items of interest. After that we could periodically send them compilations of goods that might interest them. These goods could be either small accessories or something big. Probably it's even better to interchange distribution of small and big goods. The main idea is to interest them, recall, how interesting and useful is Yandex.Market, how it could help to solve their problems. Another way to use interests analytics is to monitor discounts and sales of such goods in shops and then send letters with these offers to customers. It should also increase chances of customers to become more recent ones.
+2. 21 and 31-groups are also the most frequent users, but they haven't been active in past 2-3 months. They need to be reminded about Yandex.Market. In addition to actions from previous clause we could analyze their previous clicks in order to find out theirs goods of interest. After that we could periodically send them compilations of goods that might interest them. These ones could be either small accessories or something big. Probably it's even better to interchange distribution of small and big goods. The main idea is to interest them, recall, how interesting and useful is Yandex.Market. Another way to use interests analytics is to monitor discounts and sales of such goods in shops and then send letters with these offers to customers. It should also increase chances of customers to become more recent ones. The reason they stopped to be recent customers is that they may have some bad experience in the past, which made them angry and disappointed. This can be unsuccessful purchase which entailed bad review on that shop's page. Thus, there should be analysis of these customers most recent actions, and if there are really bad reviews or some another bad experience, especially without result, Market's team needs to deal with these cases. After that there could be contact with client, like we know, that you had a bad experience in the past, so here is our conclusion, we are really sorry etc. In the end some compliment may be offered.
 
-3. 41 and 51-groups are most hard to affect. All suggestions from two previous clauses are also applicable to these last groups, but with less chance of success. Nevertheless, it is very important to take them back, because they make up 21.85% of all monetary. Since they deserve, for example, some discounts on another Yandex's services or some amount of free deliveries on Market. The point is that they require stronger exposure, comparing to another groups. Another reason they stopped to be recent customers is they had some bad experience in the past, which made them angry and disappointed. This may be unsuccessful purchase which entailed bad review on that shop's page. Thus, there should be analysis of these customers most recent actions, and if there are really bad reviews or just bad experience, especially without result, Market's team needs to deal with these cases. After that there could be contact with client, like we know, that there you had a bad experience in the past, so here is our conclusion, we are really sorry etc. In the end some compliment should be offered.
+3. 41 and 51-groups are hard to affect. All suggestions from two previous clauses are also applicable to these last groups, but with less chance of success. Nevertheless, it is very important to take them back, because they make up 21.85% of all monetary. Since they deserve, for example, some discounts on another Yandex's services or some amount of free deliveries on Market. The point is that they require stronger exposure, comparing to another groups. Even though they were inactive for a long time, there's still a chance to take some of these customers back.
 
-These propositions and cases are permutable ones. For example, bad experience could be happened even earlier, not only with 41 or 51-groups. It is more important to solve such situations on time, without waiting up to one year (according to 3rd clause). The main idea is complex of these tools to increase loyalty of customers who spend or used to spend a lot of time in Yandex.Market. 
+These propositions and cases are permutable ones. The main idea is complex of these tools to increase loyalty of customers who spend or used to spend a lot of time in Yandex.Market. 
 
-So, if we suppose, that these suggestions could help to reestablish, for example, at least 10% of activities of the least active customers from 21 to 51-groups, Yandex.Market could gain `r as.integer(sum25)` roubles in the same activity period. In addition, if Market doesn't lose at least, again, at least 10% of the least active 11-groups customers, then it will prevent loosing -- that means earned -- `r as.integer(sum1)` roubles.
+So, if we suppose, that these suggestions could help to reestablish, for example, at least 10% of activities of the least active customers from 21 to 51-groups, Yandex.Market could gain `r as.integer(sum25)` roubles in the same activity period, up to 2638481603 roubles in case of the most active customers. In addition, if Market doesn't lose at least, again, at least 10% of the least active 11-groups customers, then it will prevent loosing -- that means earned -- `r as.integer(sum1)` roubles, and up to 5514321242 roubles in case of the most active customers, for the same activity period. 
 
